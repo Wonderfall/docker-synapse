@@ -1,7 +1,7 @@
 ARG SYNAPSE_VERSION=1.49.2
 ARG PYTHON_VERSION=3.9
 ARG ALPINE_VERSION=3.15
-ARG HARDENED_MALLOC_VERSION=9
+ARG HARDENED_MALLOC_VERSION=10
 ARG UID=991
 ARG GID=991
 
@@ -11,12 +11,13 @@ FROM alpine:${ALPINE_VERSION} as build-malloc
 
 ARG HARDENED_MALLOC_VERSION
 ARG CONFIG_NATIVE=false
+ARG VARIANT=light
 
 RUN apk --no-cache add build-base git gnupg && cd /tmp \
  && wget -q https://github.com/thestinger.gpg && gpg --import thestinger.gpg \
  && git clone --depth 1 --branch ${HARDENED_MALLOC_VERSION} https://github.com/GrapheneOS/hardened_malloc \
  && cd hardened_malloc && git verify-tag $(git describe --tags) \
- && make CONFIG_NATIVE=${CONFIG_NATIVE}
+ && make CONFIG_NATIVE=${CONFIG_NATIVE} VARIANT=${VARIANT}
 
 
 ### Build Synapse
@@ -66,11 +67,11 @@ RUN apk -U upgrade \
  && rm -rf /var/cache/apk/*
 
 
-COPY --from=build-malloc /tmp/hardened_malloc/libhardened_malloc.so /usr/local/lib/
+COPY --from=build-malloc /tmp/hardened_malloc/out-light/libhardened_malloc-light.so /usr/local/lib/
 COPY --from=builder /install /usr/local
 COPY --chown=synapse:synapse rootfs /
 
-ENV LD_PRELOAD="/usr/local/lib/libhardened_malloc.so"
+ENV LD_PRELOAD="/usr/local/lib/libhardened_malloc-light.so"
 
 USER synapse
 
