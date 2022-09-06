@@ -1,17 +1,15 @@
 ARG SYNAPSE_VERSION=1.66.0
-ARG PYTHON_VERSION=3.10
-ARG ALPINE_VERSION=3.16
 ARG HARDENED_MALLOC_VERSION=11
 ARG UID=991
 ARG GID=991
 
 
 ### Build Hardened Malloc
-FROM alpine:${ALPINE_VERSION} as build-malloc
+FROM alpine:latest as build-malloc
 
 ARG HARDENED_MALLOC_VERSION
 ARG CONFIG_NATIVE=false
-ARG VARIANT=light
+ARG VARIANT=default
 
 RUN apk --no-cache add build-base git gnupg && cd /tmp \
  && wget -q https://github.com/thestinger.gpg && gpg --import thestinger.gpg \
@@ -21,8 +19,7 @@ RUN apk --no-cache add build-base git gnupg && cd /tmp \
 
 
 ### Build Synapse
-ARG ALPINE_VERSION
-FROM python:${PYTHON_VERSION}-alpine${ALPINE_VERSION} as builder
+FROM python:alpine as builder
 
 ARG SYNAPSE_VERSION
 
@@ -38,15 +35,14 @@ RUN apk -U upgrade \
         rustup \
         zlib-dev \
  && rustup-init -y && source $HOME/.cargo/env \
+ && pip install --upgrade pip \
  && pip install --prefix="/install" --no-warn-script-location \
         matrix-synapse[all]==${SYNAPSE_VERSION}
 
 
 ### Build Production
-ARG ALPINE_VERSION
-ARG PYTHON_VERSION
 
-FROM python:${PYTHON_VERSION}-alpine${ALPINE_VERSION}
+FROM python:alpine
 
 ARG UID
 ARG GID
@@ -63,15 +59,18 @@ RUN apk -U upgrade \
         zlib \
         tzdata \
         xmlsec \
+        git \
  && adduser -g ${GID} -u ${UID} --disabled-password --gecos "" synapse \
  && rm -rf /var/cache/apk/*
 
+RUN pip install --upgrade pip \
+ && pip install -e "git+https://github.com/matrix-org/mjolnir.git#egg=mjolnir&subdirectory=synapse_antispam"
 
-COPY --from=build-malloc /tmp/hardened_malloc/out-light/libhardened_malloc-light.so /usr/local/lib/
+COPY --from=build-malloc /tmp/hardened_malloc/out/libhardened_malloc.so /usr/local/lib/
 COPY --from=builder /install /usr/local
 COPY --chown=synapse:synapse rootfs /
 
-ENV LD_PRELOAD="/usr/local/lib/libhardened_malloc-light.so"
+ENV LD_PRELOAD="/usr/local/lib/libhardened_malloc.so"
 
 USER synapse
 

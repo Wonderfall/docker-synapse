@@ -1,17 +1,17 @@
-name: build
+name: Build
 
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
   schedule:
-    # Build the image regularly (each Friday)
-    - cron: '13 21 * * 5'
+    # Build the image regularly (each Saturday)
+    - cron: '0 22 * * 6'
 
 jobs:
   build:
     name: Build, scan & push
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-latest"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -19,15 +19,15 @@ jobs:
       - name: Build an image from Dockerfile
         run: |
           docker build \
-              -t ghcr.io/wonderfall/synapse \
-              -t ghcr.io/wonderfall/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c6) \
-              -t ghcr.io/wonderfall/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c4) \
+              -t ghcr.io/tommytran732/synapse \
+              -t ghcr.io/tommytran732/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c6) \
+              -t ghcr.io/tommytran732/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c4) \
               .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/wonderfall/synapse'
+          image-ref: 'ghcr.io/tommytran732/synapse'
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
@@ -46,6 +46,6 @@ jobs:
           
       - name: Push image to GitHub
         run: |
-          docker push ghcr.io/wonderfall/synapse
-          docker push ghcr.io/wonderfall/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c6)
-          docker push ghcr.io/wonderfall/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c4)
+          docker push ghcr.io/tommytran732/synapse
+          docker push ghcr.io/tommytran732/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c6)
+          docker push ghcr.io/tommytran732/synapse:$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c4)

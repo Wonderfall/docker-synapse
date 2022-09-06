@@ -1,14 +1,14 @@
-name: scan
+name: Scan
 
 on:
   schedule:
     # Scan the image regularly (once a day)
-    - cron: '45 03 * * *'
+    - cron: '0 23 * * *'
 
 jobs:
-  build:
+  scan:
     name: Scan current image & report results
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-latest"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -16,7 +16,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/wonderfall/synapse'
+          image-ref: 'ghcr.io/tommytran732/synapse'
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
