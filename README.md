@@ -5,7 +5,7 @@
 ### Notes
 - Prebuilt images are available at `ghcr.io/wonderfall/synapse`.
 - Don't trust random images: build yourself if you can.
-- Always keep your software up-to-date: manage versions with [build-time variables](https://github.com/Wonderfall/docker-synapse/blob/main/Dockerfile#L1-L6).
+- Always keep your software up-to-date: manage versions with [build-time variables](https://github.com/Wonderfall/docker-synapse/blob/main/Dockerfile#L1-L4).
 - Images from `ghcr.io` are built every week, and scanned every day for critical vulnerabilities.
 
 ### Features & usage
