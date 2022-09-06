@@ -1,13 +1,11 @@
 ARG SYNAPSE_VERSION=1.66.0
-ARG PYTHON_VERSION=3.10
-ARG ALPINE_VERSION=3.16
 ARG HARDENED_MALLOC_VERSION=11
 ARG UID=991
 ARG GID=991
 
 
 ### Build Hardened Malloc
-FROM alpine:${ALPINE_VERSION} as build-malloc
+FROM alpine:latest as build-malloc
 
 ARG HARDENED_MALLOC_VERSION
 ARG CONFIG_NATIVE=false
@@ -22,7 +20,7 @@ RUN apk --no-cache add build-base git gnupg && cd /tmp \
 
 ### Build Synapse
 ARG ALPINE_VERSION
-FROM python:${PYTHON_VERSION}-alpine${ALPINE_VERSION} as builder
+FROM python:alpine as builder
 
 ARG SYNAPSE_VERSION
 
@@ -43,10 +41,8 @@ RUN apk -U upgrade \
 
 
 ### Build Production
-ARG ALPINE_VERSION
-ARG PYTHON_VERSION
 
-FROM python:${PYTHON_VERSION}-alpine${ALPINE_VERSION}
+FROM python:alpine
 
 ARG UID
 ARG GID
