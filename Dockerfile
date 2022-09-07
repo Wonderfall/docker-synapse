@@ -38,6 +38,7 @@ RUN apk -U upgrade \
         rustup \
         zlib-dev \
  && rustup-init -y && source $HOME/.cargo/env \
+ && pip install --upgrade pip \
  && pip install --prefix="/install" --no-warn-script-location \
         matrix-synapse[all]==${SYNAPSE_VERSION}
 
