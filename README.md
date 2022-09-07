@@ -1,5 +1,7 @@
 # wonderfall/synapse
 
+![Build, scan & push](https://github.com/wonderfall/docker-synapse/actions/workflows/build.yml/badge.svg)
+
 [Synapse](https://github.com/matrix-org/synapse) is a [Matrix](https://matrix.org/) implementation written in Python.
 
 ### Notes
