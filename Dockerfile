@@ -63,6 +63,7 @@ RUN apk -U upgrade \
         zlib \
         tzdata \
         xmlsec \
+        curl \
  && adduser -g ${GID} -u ${UID} --disabled-password --gecos "" synapse \
  && rm -rf /var/cache/apk/*
 
@@ -80,3 +81,6 @@ VOLUME /data
 EXPOSE 8008/tcp 8009/tcp 8448/tcp
 
 ENTRYPOINT ["python3", "start.py"]
+
+HEALTHCHECK --start-period=5s --interval=15s --timeout=5s \
+    CMD curl -fSs http://localhost:8008/health || exit 1
