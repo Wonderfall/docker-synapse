@@ -31,9 +31,9 @@ RUN apk -U upgrade \
         build-base \
         libffi-dev \
         libjpeg-turbo-dev \
-        libressl-dev \
         libxslt-dev \
         linux-headers \
+        openssl-dev \        
         postgresql-dev \
         rustup \
         zlib-dev \
@@ -57,10 +57,10 @@ RUN apk -U upgrade \
         libffi \
         libgcc \
         libjpeg-turbo \
-        libressl \
         libstdc++ \
         libxslt \
         libpq \
+        openssl \
         zlib \
         tzdata \
         xmlsec \
