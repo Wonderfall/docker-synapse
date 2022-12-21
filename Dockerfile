@@ -65,6 +65,7 @@ RUN apk -U upgrade \
         tzdata \
         xmlsec \
         curl \
+        icu-libs \
  && adduser -g ${GID} -u ${UID} --disabled-password --gecos "" synapse \
  && rm -rf /var/cache/apk/*
 
