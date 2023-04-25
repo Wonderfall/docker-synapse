@@ -72,7 +72,7 @@ jobs:
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
-        run: cosign sign ${TAGS}
+        run: cosign sign ${TAGS} -y
         env:
           COSIGN_EXPERIMENTAL: "true"
           TAGS: ${{ steps.meta.outputs.tags }}
