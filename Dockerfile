@@ -1,4 +1,4 @@
-ARG SYNAPSE_VERSION=1.96.0rc1
+ARG SYNAPSE_VERSION=1.97.0rc1
 ARG PYTHON_VERSION=3.11
 ARG ALPINE_VERSION=3.18
 ARG HARDENED_MALLOC_VERSION=11
@@ -33,7 +33,7 @@ RUN apk -U upgrade \
         libjpeg-turbo-dev \
         libxslt-dev \
         linux-headers \
-        openssl-dev \        
+        openssl-dev \
         postgresql-dev \
         rustup \
         zlib-dev \
