@@ -15,3 +15,7 @@
 - Unprivileged image: you should check your volumes permissions (eg `/data`), default UID/GID is 991.
 - Based on [Alpine](https://alpinelinux.org/), which provides more recent packages while having less attack surface.
 - Comes with a [hardened memory allocator](https://github.com/GrapheneOS/hardened_malloc), protecting against some heap-based buffer overflows.
+
+### Licensing
+- v1.98.0 and prior are under the [MIT License](https://mit-license.org/). 😇
+- Versions after v1.98.0 are under AGPL 3 🤮 to comply with licensing changes by Element.
