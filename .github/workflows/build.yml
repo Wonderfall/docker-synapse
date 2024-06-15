@@ -1,4 +1,4 @@
-name: build
+name: Build
 
 on:
   workflow_dispatch:
@@ -9,8 +9,8 @@ on:
     paths-ignore:
       - '**.md'
   schedule:
-    # Build the image regularly (each Friday)
-    - cron: '13 21 * * 5'
+    # Build the image daily
+    - cron: '0 0 * * *'
 
 env:
   REGISTRY: ghcr.io
@@ -28,11 +28,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Extract version for tags
-        run: |
-          echo "FULL_VERSION=$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile)" >> $GITHUB_ENV
-          echo "MAJOR_VERSION=$(grep -oP '(?<=SYNAPSE_VERSION=).*' Dockerfile | head -c5)" >> $GITHUB_ENV
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
@@ -56,8 +51,6 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             latest
-            ${{ env.FULL_VERSION }}
-            ${{ env.MAJOR_VERSION }}
 
       - name: Build and push Docker image
         id: build-and-push
@@ -74,9 +67,11 @@ jobs:
         env:
           TAGS: ${{ steps.meta.outputs.tags }}
 
-  scan:
-    name: Scan current image & report results
+  trivy:
+    name: Scan current image with Trivy
     needs: build
+    permissions:
+      security-events: write
     runs-on: "ubuntu-latest"
     steps:
       - name: Run Trivy vulnerability scanner
@@ -86,10 +81,31 @@ jobs:
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
-          vuln-type: "os"
+          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          vuln-type: "os,library"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
+          category: 'trivy'
+
+  grype:
+    name: Scan current image with Grype
+    needs: build
+    permissions:
+      security-events: write
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Run Grype vulnerability scanner
+        uses: anchore/scan-action@v3
+        id: grype
+        with:
+          image: "ghcr.io/wonderfall/synapse"
+          fail-build: false
+
+      - name: Upload Grype scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.grype.outputs.sarif }}
+          category: grype
