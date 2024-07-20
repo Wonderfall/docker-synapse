@@ -19,7 +19,7 @@ env:
 jobs:
   build:
     name: Build & push new image
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -79,36 +79,36 @@ jobs:
     needs: build
     permissions:
       security-events: write
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-24.04
     steps:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'ghcr.io/wonderfall/synapse'
-          format: 'template'
+          image-ref: ghcr.io/wonderfall/synapse
+          format: template
           template: '@/contrib/sarif.tpl'
-          output: 'trivy-results.sarif'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-          vuln-type: "os,library"
+          output: trivy-results.sarif
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          vuln-type: os,library
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-results.sarif'
-          category: 'trivy'
+          sarif_file: trivy-results.sarif
+          category: trivy
 
   grype:
     name: Scan current image with Grype
     needs: build
     permissions:
       security-events: write
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-24.04
     steps:
       - name: Run Grype vulnerability scanner
         uses: anchore/scan-action@v4
         id: grype
         with:
-          image: "ghcr.io/wonderfall/synapse"
+          image: ghcr.io/wonderfall/synapse
           fail-build: false
 
       - name: Upload Grype scan results to GitHub Security tab
